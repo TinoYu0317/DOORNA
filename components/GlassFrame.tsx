@@ -6,6 +6,7 @@ interface GlassFrameProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  onIconClick?: () => void; // New prop for icon tap
   onLongPress?: () => void;
   title?: string;
   icon?: React.ReactNode;
@@ -21,13 +22,14 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
   children, 
   className = '', 
   onClick, 
+  onIconClick,
   onLongPress,
   title,
   icon,
   theme = 'light',
   blurRadius = 40,
   tintOpacity = 0.15,
-  cornerRadius = 36, // Increased from 24 to 36 for "rounder" aesthetic
+  cornerRadius = 36, 
 }) => {
   const startPos = useRef({ x: 0, y: 0 });
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -39,6 +41,7 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
 
     timerRef.current = setTimeout(() => {
       if (onLongPress && isLongPressValid.current) {
+         isLongPressValid.current = false; 
          onLongPress();
       }
     }, 450);
@@ -50,13 +53,15 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
     const diffY = Math.abs(e.touches[0].clientY - startPos.current.y);
     if (diffX > 10 || diffY > 10) {
       clearTimeout(timerRef.current);
-      isLongPressValid.current = false;
+      isLongPressValid.current = false; 
     }
   };
 
   const endPress = () => {
     clearTimeout(timerRef.current);
-    if (isLongPressValid.current && onClick) onClick();
+    if (isLongPressValid.current && onClick) {
+        onClick();
+    }
   };
 
   const isDark = theme === 'dark';
@@ -78,14 +83,33 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
       >
         <div className="flex flex-col h-full">
             {(title || icon) && (
-              <div className={`flex items-center gap-2 p-4 border-b transition-colors duration-500 shrink-0 ${isDark ? 'border-white/5' : 'border-black/5'}`}>
-                {icon && <span className={`opacity-80 ${isDark ? 'text-white' : 'text-black/70'}`}>{icon}</span>}
-                {title && <span className={`text-[10px] font-black tracking-[0.15em] uppercase ${isDark ? 'text-white/40' : 'text-black/40'}`}>{title}</span>}
+              <div className={`flex items-center gap-2 px-5 py-4 border-b transition-colors duration-500 shrink-0 ${isDark ? 'border-white/5' : 'border-black/5'}`}>
+                {/* Icon Wrapper with explicit Click Handler */}
+                {icon && (
+                    <div 
+                        className={`opacity-80 transition-opacity active:opacity-40 flex items-center justify-center -ml-1 p-1 rounded-full ${onIconClick ? 'cursor-pointer hover:bg-black/5 dark:hover:bg-white/10' : ''} ${isDark ? 'text-white' : 'text-black/70'}`}
+                        onClick={(e) => {
+                            if (onIconClick) {
+                                e.stopPropagation(); // Stop bubbling to main frame click
+                                onIconClick();
+                            }
+                        }}
+                        onTouchEnd={(e) => {
+                            // Ensure touch devices also respect the stop propagation if necessary
+                            if (onIconClick) {
+                                e.stopPropagation();
+                            }
+                        }}
+                    >
+                        {icon}
+                    </div>
+                )}
+                {title && <span className={`text-[10px] font-black tracking-[0.15em] uppercase pointer-events-none ${isDark ? 'text-white/40' : 'text-black/40'}`}>{title}</span>}
               </div>
             )}
 
-            {/* Content Area: Added overflow-hidden to ensure content never bleeds into padding/borders */}
-            <div className={`relative flex-1 min-h-0 p-4 overflow-hidden transition-colors duration-500 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+            {/* Content Area */}
+            <div className={`relative flex-1 min-h-0 p-5 overflow-hidden transition-colors duration-500 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {children}
             </div>
         </div>

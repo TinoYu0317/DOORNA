@@ -249,7 +249,9 @@ const App: React.FC = () => {
   const finalDoorY = currentState === AppState.S0_LOBBY_DOOR ? doorPosition.y : 0;
 
   return (
-    <div className={`relative w-full h-screen overflow-hidden select-none bg-transparent transition-colors duration-500`}>
+    // Changed: Added max-w-[430px] (iPhone Max width) and mx-auto for desktop centering. 
+    // Changed: h-screen to h-[100dvh] for better mobile browser support.
+    <div className={`relative w-full max-w-[430px] mx-auto h-[100dvh] overflow-hidden select-none bg-transparent transition-colors duration-500 shadow-2xl`}>
       
       {/* 
          DESK LAYER (Bottom) 

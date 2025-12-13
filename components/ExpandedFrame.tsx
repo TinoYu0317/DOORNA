@@ -27,8 +27,8 @@ export const ExpandedFrame: React.FC<ExpandedFrameProps> = ({ type, items, onClo
       <GlassCard 
         radius={0} 
         theme={theme}
-        blur={50}
-        opacity={isDark ? 0.85 : 0.9}
+        blur={isDark ? 80 : 50} // Higher blur for dark mode
+        opacity={isDark ? 0.96 : 0.9} // Significantly higher opacity for dark mode readability
         className="w-full h-full"
       >
         {/* Inner layout wrapper to ensure flex-1 works for scrolling list */}

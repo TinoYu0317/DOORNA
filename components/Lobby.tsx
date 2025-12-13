@@ -21,6 +21,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
   const [feedback, setFeedback] = useState<string | null>(null);
   const [mode, setMode] = useState<InputMode>('text');
   const [isRecording, setIsRecording] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   
   const [showSelector, setShowSelector] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +38,8 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
     if (!input.trim() && !isRecording) return;
 
     setIsProcessing(true);
+    setHasStarted(true); // Hide the tagline once interaction starts
+
     const text = input || (isRecording ? "Voice Note (Processed)" : "");
     setInput('');
     setIsRecording(false);
@@ -138,16 +141,35 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
       </button>
 
       {/* Center Input Container */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center items-center w-full px-6">
+      <div className="relative z-10 flex-1 flex flex-col justify-center items-center w-full px-5">
         
+        {/* Tagline that disappears after interaction */}
+        {/* UPDATED: Sits closer to the bar (mb-3), smaller aesthetics */}
+        <AnimatePresence>
+          {!hasStarted && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5, scale: 0.98 }}
+              transition={{ duration: 0.4 }}
+              className={`mb-3 text-center px-4 w-full`}
+            >
+              <h2 className={`text-base font-normal tracking-wide italic opacity-70 ${isDark ? 'text-white/80' : 'text-stone-600'}`}>
+                "Try to organize without using your brain."
+              </h2>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="w-full max-w-md relative group">
           {/* 
             SEARCH BAR (CURVED IN / INSET)
             We override the default GlassCard boxShadow to create a sunken/recessed effect.
+            UPDATED: h-14 for a slimmer look (was h-16)
           */}
           <GlassCard
             className={`
-              w-full h-16
+              w-full h-14 
               transition-all duration-300
               ${isProcessing ? 'opacity-50 pointer-events-none' : 'opacity-100'}
               ${isRecording ? 'ring-2 ring-red-400/30' : ''}
@@ -178,20 +200,21 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
                   value={isRecording ? "Recording..." : input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                  placeholder={mode === 'voice' ? "Tap icon to stop..." : "The first thought in your brain…"}
+                  placeholder={mode === 'voice' ? "Tap icon to stop..." : "What's in your mind?"}
                   disabled={isRecording}
-                  className={`flex-1 bg-transparent border-none outline-none text-lg font-normal min-w-0 ${isDark ? 'text-gray-200 placeholder-gray-600' : 'text-stone-700 placeholder-stone-400'}`}
+                  // Font size adjusted slightly for slimmer bar
+                  className={`flex-1 bg-transparent border-none outline-none text-base font-normal min-w-0 ${isDark ? 'text-gray-200 placeholder-gray-600' : 'text-stone-700 placeholder-stone-400'}`}
                 />
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                     
                     {/* 1. Plus Button */}
                     <div className="relative">
                         <div 
-                            className={`w-10 h-10 rounded-full active:scale-90 transition-all cursor-pointer flex items-center justify-center ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-black/5 text-stone-500'}`}
+                            className={`w-9 h-9 rounded-full active:scale-90 transition-all cursor-pointer flex items-center justify-center ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-black/5 text-stone-500'}`}
                             onClick={toggleSelector}
                         >
-                            {mode === 'image' ? <ImageIcon size={20} /> : mode === 'file' ? <FileText size={20} /> : <Plus size={20} />}
+                            {mode === 'image' ? <ImageIcon size={18} /> : mode === 'file' ? <FileText size={18} /> : <Plus size={18} />}
                         </div>
 
                         <AnimatePresence>
@@ -218,7 +241,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
 
                     {/* 2. Voice Toggle */}
                     <div 
-                        className={`w-10 h-10 rounded-full active:scale-90 transition-all cursor-pointer flex items-center justify-center ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-black/5 text-stone-500'}`}
+                        className={`w-9 h-9 rounded-full active:scale-90 transition-all cursor-pointer flex items-center justify-center ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-black/5 text-stone-500'}`}
                         onClick={(e) => { e.stopPropagation(); handleMicTap(); }}
                     >
                         {isRecording ? (
@@ -228,16 +251,16 @@ export const Lobby: React.FC<LobbyProps> = ({ onOpenDoor, onSaveItem, isVisible,
                                 className="w-3 h-3 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.6)]"
                             />
                         ) : (
-                            <Mic size={20} />
+                            <Mic size={18} />
                         )}
                     </div>
 
                     <button 
                     onClick={() => handleSubmit()}
                     disabled={!input.trim() && !isRecording}
-                    className={`w-10 h-10 flex items-center justify-center transition-colors ${isDark ? 'text-blue-400 disabled:text-gray-600' : 'text-blue-600 disabled:text-stone-300'}`}
+                    className={`w-9 h-9 flex items-center justify-center transition-colors ${isDark ? 'text-blue-400 disabled:text-gray-600' : 'text-blue-600 disabled:text-stone-300'}`}
                     >
-                    <Send size={20} strokeWidth={2} />
+                    <Send size={18} strokeWidth={2} />
                     </button>
                 </div>
             </div>

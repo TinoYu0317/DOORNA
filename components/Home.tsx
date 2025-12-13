@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ViewMode, FrameType, DoornaItem } from '../types';
 import { GlassFrame } from './GlassFrame';
-import { Calendar, CheckSquare, Image as ImageIcon, Key, Banknote, StickyNote, Sun, MoreHorizontal, Lock, Wifi, CreditCard, Shield } from 'lucide-react';
+import { Calendar as CalendarIcon, CheckSquare, Image as ImageIcon, Key, Banknote, StickyNote, Sun, Lock } from 'lucide-react';
 
 interface HomeProps {
   viewMode: ViewMode;
@@ -21,7 +21,7 @@ export const Home: React.FC<HomeProps> = ({
   items, 
   onFrameTap, 
   onFrameLongPress, 
-  dragX,
+  dragX, 
   theme
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,6 @@ export const Home: React.FC<HomeProps> = ({
   
   // Widget Specific States
   const [calendarView, setCalendarView] = useState<'month' | 'week'>('month');
-  const [todayView, setTodayView] = useState<'list' | 'schedule'>('list');
 
   const getItemsFor = (type: FrameType) => items.filter(i => i.type === type);
 
@@ -41,45 +40,62 @@ export const Home: React.FC<HomeProps> = ({
     // --- KEY FRAME (SECURE FROSTED GLASS) ---
     if (type === FrameType.KEY) {
         return (
-            <div className="h-full flex flex-col relative overflow-hidden rounded-xl">
-                {/* Content Container - We blur THIS content directly for a smoother look */}
-                <div className="relative flex-1 flex flex-col justify-center">
-                    {/* Background Pattern of "Sensitive Data" */}
-                    <div className="space-y-4 opacity-40 filter blur-[5px] select-none scale-105 origin-center transform transition-all duration-500" aria-hidden="true">
-                        {/* Generate some fake rows if empty or mix with real ones for the visual effect */}
-                        {(frameItems.length > 0 ? frameItems : [1,2,3]).slice(0,4).map((item, idx) => {
-                            const title = typeof item === 'object' ? item.title : ['Main Card', 'Netflix', 'WiFi'][idx] || 'Secure';
-                            return (
-                                <div key={idx} className={`flex items-center gap-3 px-1`}>
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDark ? 'bg-white/10' : 'bg-stone-500/10'}`}>
-                                        <Key size={14} className="opacity-50" />
-                                    </div>
-                                    <div className="flex-1 space-y-1">
-                                        <div className={`h-2 w-20 rounded-full ${isDark ? 'bg-white/20' : 'bg-stone-500/20'}`} />
-                                        <div className={`h-1.5 w-12 rounded-full ${isDark ? 'bg-white/10' : 'bg-stone-500/10'}`} />
-                                    </div>
-                                    <div className={`text-xs font-bold tracking-widest opacity-30 ${isDark ? 'text-white' : 'text-black'}`}>••••••</div>
+            <div className="h-full flex flex-col relative overflow-hidden">
+                {/* 
+                   Background: Blurred List of "Secrets" 
+                */}
+                <div 
+                    className="flex-1 flex flex-col gap-2 opacity-50 filter blur-[5px] select-none transition-all duration-500 pt-1" 
+                    style={{ maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)' }}
+                >
+                    {[1, 2, 3].map((_, i) => (
+                        <div key={i} className="flex items-center justify-between px-1">
+                             <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-white/10' : 'bg-stone-500/10'}`}>
+                                    <Key size={14} className="opacity-50" />
                                 </div>
-                            )
-                        })}
-                    </div>
-
-                    {/* The "Frosted Privacy" Overlay */}
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
-                        <div className={`
-                            relative w-14 h-14 rounded-full flex items-center justify-center 
-                            backdrop-blur-md shadow-2xl transition-transform duration-300 group-active:scale-95
-                            ${isDark 
-                                ? 'bg-gradient-to-br from-white/10 to-white/5 border border-white/10 text-white' 
-                                : 'bg-gradient-to-br from-white/60 to-white/30 border border-white/40 text-stone-600'}
-                        `}>
-                            <Lock size={22} strokeWidth={2} />
-                            {/* Subtle shine on lock */}
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/20 to-transparent pointer-events-none" />
+                                <div className="space-y-1.5">
+                                    <div className={`h-2 w-20 rounded-full ${isDark ? 'bg-white/20' : 'bg-stone-600/20'}`} />
+                                    <div className={`h-1.5 w-12 rounded-full ${isDark ? 'bg-white/10' : 'bg-stone-500/10'}`} />
+                                </div>
+                             </div>
+                             <div className={`text-[10px] tracking-[0.3em] opacity-30 ${isDark ? 'text-white' : 'text-black'}`}>•••••</div>
                         </div>
-                        <span className={`mt-3 text-[9px] font-bold tracking-[0.25em] uppercase opacity-70 ${isDark ? 'text-white/60' : 'text-stone-600'}`}>
+                    ))}
+                </div>
+
+                {/* Foreground: Biometric Lock UI */}
+                <div className="absolute inset-0 z-20 flex flex-row items-center justify-center gap-3 pb-20">
+                     <motion.div 
+                        whileTap={{ scale: 0.95 }}
+                        className={`
+                            relative w-12 h-12 rounded-[18px] flex items-center justify-center
+                            backdrop-blur-xl shadow-xl border
+                            transition-all duration-300 group-active:scale-95
+                            ${isDark 
+                                ? 'bg-gradient-to-br from-white/10 to-white/5 border-white/20 text-white shadow-black/40' 
+                                : 'bg-gradient-to-br from-white/80 to-white/40 border-white/60 text-stone-600 shadow-stone-300/40'}
+                        `}
+                    >
+                        <Lock size={18} strokeWidth={2.5} />
+                        
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 rounded-[18px] overflow-hidden pointer-events-none">
+                            <motion.div 
+                                animate={{ left: ['-100%', '200%'] }}
+                                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 1 }}
+                                className={`absolute top-0 bottom-0 w-1/2 -skew-x-12 blur-md ${isDark ? 'bg-white/10' : 'bg-white/40'}`}
+                            />
+                        </div>
+                    </motion.div>
+                    
+                    <div className="flex flex-col justify-center">
+                        <div className={`text-xs font-bold tracking-[0.2em] uppercase ${isDark ? 'text-white/90' : 'text-stone-700'}`}>
                             Locked
-                        </span>
+                        </div>
+                        <div className={`text-[9px] font-medium tracking-wide opacity-50 ${isDark ? 'text-white' : 'text-stone-600'}`}>
+                            Tap to Authenticate
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,57 +105,43 @@ export const Home: React.FC<HomeProps> = ({
     // --- TODAY WIDGET ---
     if (type === FrameType.TODAY) {
         return (
-            <div className="h-full flex flex-col">
-                <div className="flex justify-between items-center mb-2">
-                    <span className={`text-xs font-bold tracking-wider uppercase ${isDark ? 'text-gray-500' : 'text-stone-400'}`}>
-                        {todayView === 'list' ? 'Priorities' : 'Timeline'}
+            // Ensure full height containment and no overflow out of this div
+            <div className="h-full flex flex-col overflow-hidden -mt-1">
+                <div className="flex justify-between items-center mb-1 flex-shrink-0">
+                    <span className={`text-[10px] font-bold tracking-wider uppercase opacity-70 ${isDark ? 'text-gray-400' : 'text-stone-500'}`}>
+                        Upcoming
                     </span>
-                    <span className="text-xs text-orange-500 font-semibold">
+                    <span className="text-[10px] text-orange-500 font-bold tracking-wide">
                         {new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}
                     </span>
                 </div>
 
-                {todayView === 'list' ? (
-                    // LIST MODE
-                    <div className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-                         {frameItems.map(i => (
-                             <div key={i.id} className="flex items-center gap-3 p-1">
-                                 {/* Darker checkbox border for transparent glass */}
-                                 <div className={`w-4 h-4 rounded border ${i.status === 'done' ? 'bg-stone-300 border-stone-300' : 'border-stone-500/30'}`} />
-                                 <div className={`text-sm ${i.status === 'done' ? 'text-stone-400 line-through' : isDark ? 'text-gray-200' : 'text-stone-700'}`}>
-                                     {i.title}
-                                 </div>
-                                 <div className="ml-auto text-xs text-stone-400">{i.payload?.time}</div>
-                             </div>
-                         ))}
-                         {frameItems.length === 0 && <div className="text-stone-400 text-sm italic mt-4">All clear today</div>}
-                    </div>
-                ) : (
-                    // SCHEDULE MODE (24hr)
-                    <div className="flex-1 relative overflow-y-auto no-scrollbar pt-2">
-                        {/* Darker guideline for transparent glass */}
-                        <div className={`absolute left-8 top-0 bottom-0 w-px ${isDark ? 'bg-gray-700' : 'bg-stone-500/20'}`} />
-                        
-                        {[7,8,9,10,11,12,13,14,15,16,17,18].map(hour => {
-                            const event = frameItems.find(i => i.payload?.time && i.payload.time.startsWith(hour.toString().padStart(2,'0')));
-                            
-                            return (
-                                <div key={hour} className="flex items-start mb-4 relative h-10">
-                                    <div className="w-6 text-[10px] text-stone-400 text-right mr-3 pt-0.5">{hour}</div>
-                                    
-                                    {event ? (
-                                        <div className={`flex-1 border-l-2 border-orange-400 p-1.5 rounded-r-md ${isDark ? 'bg-orange-900/20' : 'bg-orange-50/50'}`}>
-                                            <div className={`text-xs font-medium leading-none ${isDark ? 'text-gray-200' : 'text-stone-800'}`}>{event.title}</div>
-                                        </div>
-                                    ) : (
-                                        // Darker separator line
-                                        <div className={`flex-1 border-t mt-2 ${isDark ? 'border-gray-800' : 'border-stone-500/10'}`} />
-                                    )}
+                <div 
+                    className="flex-1 min-h-0 w-full overflow-y-auto no-scrollbar pb-2"
+                    style={{
+                        maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
+                    }}
+                >
+                     <div className="flex flex-col gap-0.5">
+                        {frameItems.map(i => (
+                            <div key={i.id} className="flex flex-col gap-0.5 border-b border-dashed border-opacity-20 last:border-0 pb-1.5 pt-0.5 border-gray-400">
+                                <div className="flex justify-between items-center">
+                                    <div className={`text-xs font-semibold leading-tight truncate pr-2 ${i.status === 'done' ? 'text-stone-400 line-through' : isDark ? 'text-gray-200' : 'text-stone-800'}`}>
+                                        {i.title}
+                                    </div>
+                                    <div className={`text-[10px] font-medium whitespace-nowrap flex-shrink-0 ${isDark ? 'text-orange-400' : 'text-orange-600'}`}>{i.payload?.time}</div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                )}
+                                {i.payload?.location && (
+                                    <div className={`text-[9px] truncate ${isDark ? 'text-gray-500' : 'text-stone-500'}`}>
+                                        {i.payload.location}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                     </div>
+                     {frameItems.length === 0 && <div className="text-stone-400 text-xs italic mt-2">All clear today</div>}
+                </div>
             </div>
         )
     }
@@ -210,12 +212,11 @@ export const Home: React.FC<HomeProps> = ({
     // --- FINANCE WIDGET ---
     if (type === FrameType.FINANCE) {
         return (
-             <div className="h-full flex flex-col pt-2">
-                 <div className={`text-sm font-medium uppercase tracking-wide mb-1 ${isDark ? 'text-gray-500' : 'text-stone-400'}`}>Total Balance</div>
-                 <div className={`text-3xl font-light mb-6 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>$3,420.50</div>
-                 <div className="space-y-3 flex-1 overflow-hidden">
+             <div className="h-full flex flex-col pt-0">
+                 <div className={`text-xs font-medium uppercase tracking-wide mb-1 opacity-70 ${isDark ? 'text-gray-500' : 'text-stone-400'}`}>Total Balance</div>
+                 <div className={`text-2xl font-light mb-3 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>$3,420.50</div>
+                 <div className="space-y-2 flex-1 overflow-hidden">
                      {frameItems.slice(0, 3).map(i => (
-                         // Increased separator contrast
                          <div key={i.id} className={`flex justify-between items-center text-sm border-b pb-2 last:border-0 ${isDark ? 'border-white/10' : 'border-stone-500/10'}`}>
                              <div className="flex flex-col">
                                  <span className={`font-medium truncate max-w-[100px] ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>{i.title}</span>
@@ -249,7 +250,7 @@ export const Home: React.FC<HomeProps> = ({
       id: 'page1',
       frames: [
         { type: FrameType.TODAY, title: 'Today', icon: <Sun size={18} />, span: 'col-span-2 row-span-1' },
-        { type: FrameType.CALENDAR, title: '', icon: null, span: 'col-span-2 row-span-2' }, 
+        { type: FrameType.CALENDAR, title: '', icon: <CalendarIcon size={18} />, span: 'col-span-2 row-span-2' }, 
         { type: FrameType.REMINDER, title: 'Reminders', icon: <CheckSquare size={18} />, span: 'col-span-2 row-span-1' },
       ]
     },
@@ -284,7 +285,7 @@ export const Home: React.FC<HomeProps> = ({
         transition={{ type: "spring", stiffness: 300, damping: 35 }}
       >
         {viewMode === ViewMode.SINGLE ? (
-            <div className="w-full min-h-full overflow-y-auto p-6 space-y-6 pt-14 pb-32 no-scrollbar">
+            <div className="w-full min-h-full overflow-y-auto p-5 space-y-6 pt-14 pb-32 no-scrollbar">
                 {pages.flatMap(p => p.frames).map((frame, i) => (
                     <GlassFrame 
                         key={frame.type} 
@@ -293,6 +294,12 @@ export const Home: React.FC<HomeProps> = ({
                         icon={frame.icon}
                         theme={theme}
                         onClick={() => onFrameTap(frame.type)}
+                        onIconClick={() => {
+                            if (frame.type === FrameType.CALENDAR) {
+                                setCalendarView(prev => prev === 'month' ? 'week' : 'month');
+                            }
+                            // Add other toggles here if needed
+                        }}
                         onLongPress={() => onFrameLongPress(frame.type)}
                     >
                          {renderFrameContent(frame.type)}
@@ -301,7 +308,7 @@ export const Home: React.FC<HomeProps> = ({
             </div>
         ) : (
             pages.map((page, i) => (
-                <div key={page.id} className="min-w-full h-full p-6 pt-14 grid grid-cols-2 grid-rows-4 gap-4">
+                <div key={page.id} className="min-w-full h-full p-5 pt-14 grid grid-cols-2 grid-rows-4 gap-3">
                      {page.frames.map((frame) => (
                          <GlassFrame 
                             key={frame.type} 
@@ -309,13 +316,10 @@ export const Home: React.FC<HomeProps> = ({
                             title={frame.title}
                             icon={frame.icon}
                             theme={theme}
-                            onClick={() => {
+                            onClick={() => onFrameTap(frame.type)}
+                            onIconClick={() => {
                                 if (frame.type === FrameType.CALENDAR) {
                                     setCalendarView(prev => prev === 'month' ? 'week' : 'month');
-                                } else if (frame.type === FrameType.TODAY) {
-                                    setTodayView(prev => prev === 'list' ? 'schedule' : 'list');
-                                } else {
-                                    onFrameTap(frame.type);
                                 }
                             }}
                             onLongPress={() => onFrameLongPress(frame.type)}
