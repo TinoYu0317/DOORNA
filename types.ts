@@ -23,9 +23,9 @@ export enum FrameType {
   CALENDAR = 'CALENDAR',
   REMINDER = 'REMINDER',
   NOTE = 'NOTE',
-  GALLERY = 'GALLERY',
   FINANCE = 'FINANCE',
   KEY = 'KEY',
+  SETTINGS = 'SETTINGS',
 }
 
 export interface DoornaItem {
@@ -38,6 +38,7 @@ export interface DoornaItem {
   payload: any;
   status: 'active' | 'draft' | 'done';
   tags?: string[];
+  genre?: string; // AI-assigned category (e.g., "Food", "Sport")
 }
 
 export interface RoutingResult {
@@ -45,6 +46,7 @@ export interface RoutingResult {
   title: string;
   summary: string;
   payload: any;
+  genre?: string;
 }
 
 export interface GestureState {

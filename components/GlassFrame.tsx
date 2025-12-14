@@ -83,11 +83,16 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
       >
         <div className="flex flex-col h-full">
             {(title || icon) && (
-              <div className={`flex items-center gap-2 px-5 py-4 border-b transition-colors duration-500 shrink-0 ${isDark ? 'border-white/5' : 'border-black/5'}`}>
+              <div className={`flex items-center gap-2.5 px-5 pt-5 pb-2 transition-colors duration-500 shrink-0`}>
                 {/* Icon Wrapper with explicit Click Handler */}
                 {icon && (
                     <div 
-                        className={`opacity-80 transition-opacity active:opacity-40 flex items-center justify-center -ml-1 p-1 rounded-full ${onIconClick ? 'cursor-pointer hover:bg-black/5 dark:hover:bg-white/10' : ''} ${isDark ? 'text-white' : 'text-black/70'}`}
+                        className={`
+                            opacity-80 transition-all duration-500
+                            flex items-center justify-center -ml-1 p-1 rounded-full 
+                            ${onIconClick ? 'cursor-pointer hover:bg-black/5 dark:hover:bg-white/10' : ''} 
+                            ${isDark ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'text-black/80'}
+                        `}
                         onClick={(e) => {
                             if (onIconClick) {
                                 e.stopPropagation(); // Stop bubbling to main frame click
@@ -95,21 +100,20 @@ export const GlassFrame: React.FC<GlassFrameProps> = ({
                             }
                         }}
                         onTouchEnd={(e) => {
-                            // Ensure touch devices also respect the stop propagation if necessary
                             if (onIconClick) {
                                 e.stopPropagation();
                             }
                         }}
                     >
-                        {icon}
+                        {React.cloneElement(icon as React.ReactElement<any>, { size: 16, strokeWidth: 2.5 })}
                     </div>
                 )}
-                {title && <span className={`text-[10px] font-black tracking-[0.15em] uppercase pointer-events-none ${isDark ? 'text-white/40' : 'text-black/40'}`}>{title}</span>}
+                {title && <span className={`text-[11px] font-bold tracking-[0.15em] uppercase pointer-events-none opacity-50 ${isDark ? 'text-white' : 'text-black'}`}>{title}</span>}
               </div>
             )}
 
             {/* Content Area */}
-            <div className={`relative flex-1 min-h-0 p-5 overflow-hidden transition-colors duration-500 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+            <div className={`relative flex-1 min-h-0 px-5 pb-5 pt-1 overflow-hidden transition-colors duration-500 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
               {children}
             </div>
         </div>
